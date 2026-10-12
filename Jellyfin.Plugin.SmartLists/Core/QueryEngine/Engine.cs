@@ -301,6 +301,15 @@ namespace Jellyfin.Plugin.SmartLists.Core.QueryEngine
                     includeParent: r.IncludeParentGenresEffective);
             }
 
+            if (r.MemberName == "Collections")
+            {
+                return BuildParentAwareFieldExpression(r, param, logger,
+                    baseField: "Collections",
+                    parentField: "ParentCollections",
+                    onlyParent: false,
+                    includeParent: r.IncludeParentCollections == true);
+            }
+
             return null;
         }
 

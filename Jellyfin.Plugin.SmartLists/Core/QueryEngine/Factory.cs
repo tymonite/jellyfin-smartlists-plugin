@@ -118,6 +118,12 @@ namespace Jellyfin.Plugin.SmartLists.Core.QueryEngine
             set => RequiredGroups = value ? RequiredGroups | ExtractionGroup.ParentFavorite : RequiredGroups & ~ExtractionGroup.ParentFavorite;
         }
 
+        public bool ExtractParentCollections
+        {
+            get => RequiredGroups.HasFlag(ExtractionGroup.ParentCollections);
+            set => RequiredGroups = value ? RequiredGroups | ExtractionGroup.ParentCollections : RequiredGroups & ~ExtractionGroup.ParentCollections;
+        }
+
         public bool ExtractLastEpisodeAirDate
         {
             get => RequiredGroups.HasFlag(ExtractionGroup.LastEpisodeAirDate);
@@ -3133,6 +3139,13 @@ namespace Jellyfin.Plugin.SmartLists.Core.QueryEngine
                 operand.Collections = [];
             }
 
+            // Collections of the ancestors (season, series, album, ...) - collections are usually
+            // assigned at series/album level, so an episode or track is rarely a direct member.
+            // Gated like the parent Tags: Phase 1 masks the group off and gets an empty list.
+            operand.ParentCollections = options.ExtractCollections && options.ExtractParentCollections
+                ? ExtractParentCollections(baseItem, user, libraryManager, cache, logger, options.CollectionRecursionDepth, options.Origin)
+                : [];
+
             // Extract playlists - only when needed for performance
             // Note: Playlists don't support nesting (can't contain other playlists), so no recursion depth needed
             if (options.ExtractPlaylists)
@@ -3605,6 +3618,43 @@ namespace Jellyfin.Plugin.SmartLists.Core.QueryEngine
         /// <param name="recursionDepth">How deep to traverse nested collections (0 = direct members only)</param>
         /// <param name="origin">The list being built (kept out of its own results to prevent self-reference)</param>
         /// <returns>List of collection names this item belongs to</returns>
+        /// <summary>
+        /// Union of the collections every ancestor (the same walk as the parent Tags) belongs to.
+        /// Each ancestor's membership comes from <see cref="ExtractCollections"/>, so it is cached
+        /// per ancestor and shared by all of its children.
+        /// </summary>
+        private static List<string> ExtractParentCollections(BaseItem baseItem, User user, ILibraryManager libraryManager, RefreshQueueServiceRefreshCache cache, ILogger? logger, int recursionDepth, ListOrigin? origin)
+        {
+            try
+            {
+                var ancestors = AncestorValueResolver.ResolveAncestors(baseItem, libraryManager, cache.AncestorItemsById, logger);
+                if (ancestors.Count == 0)
+                {
+                    return [];
+                }
+
+                var collections = new List<string>();
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var ancestor in ancestors)
+                {
+                    foreach (var name in ExtractCollections(ancestor, user, libraryManager, cache, logger, recursionDepth, origin))
+                    {
+                        if (seen.Add(name))
+                        {
+                            collections.Add(name);
+                        }
+                    }
+                }
+
+                return collections;
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "SmartLists failed to resolve parent collections for '{Name}'", baseItem.Name);
+                return [];
+            }
+        }
+
         private static List<string> ExtractCollections(BaseItem baseItem, User user, ILibraryManager libraryManager, RefreshQueueServiceRefreshCache cache, ILogger? logger, int recursionDepth = 0, ListOrigin? origin = null)
         {
             // Ensure recursion depth is within valid range (0 = no recursion, 1-10 = levels to traverse)

@@ -93,6 +93,10 @@ namespace Jellyfin.Plugin.SmartLists.Core.QueryEngine
         // Collections field - indicates which collections this item belongs to
         public List<string> Collections { get; set; } = [];
 
+        // Collections of the item's ancestors (season, series, album, ...) - filled only when a
+        // Collections rule has IncludeParentCollections
+        public List<string> ParentCollections { get; set; } = [];
+
         // Playlists field - indicates which playlists this item belongs to
         public List<string> Playlists { get; set; } = [];
 

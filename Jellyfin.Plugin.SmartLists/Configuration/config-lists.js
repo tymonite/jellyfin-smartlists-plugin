@@ -1874,6 +1874,9 @@
                             if (rule.IncludeEpisodesWithinSeries === true) {
                                 collectionParts.push('including episodes within series');
                             }
+                            if (rule.IncludeParentCollections === true) {
+                                collectionParts.push('including parent collections');
+                            }
                             // Add depth info if set
                             if (rule.CollectionSearchDepth !== undefined && rule.CollectionSearchDepth !== null && rule.CollectionSearchDepth > 0) {
                                 collectionParts.push('depth: ' + rule.CollectionSearchDepth);

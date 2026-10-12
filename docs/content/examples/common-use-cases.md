@@ -14,6 +14,13 @@ Here are some popular playlist and collection types you can create:
 - Each family member gets their own personalized "Continue Watching" playlist showing their next unwatched episodes
 - Auto-refreshes when any family member watches an episode
 
+### My Shows Only (Excluding Shared Series)
+- **Media type**: Episode
+- **Next Unwatched** = True
+- **Collection name** is not in `Family; Kids` with **Include parent collections**: Yes
+
+Collections are assigned to the series; the option makes every episode of those series inherit the membership, so they are excluded.
+
 ### Family Movie Night
 - **Next Unwatched** = True AND **Parental Rating** = "PG" or "G"
 

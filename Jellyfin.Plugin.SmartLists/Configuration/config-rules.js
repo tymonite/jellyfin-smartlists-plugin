@@ -1170,6 +1170,15 @@
             '<option value="true">Yes - Include individual episodes from series in collections</option>' +
             '</select>' +
             '</div>' +
+            '<div class="rule-collections-parent" style="margin-bottom: 0.75em;">' +
+            '<label style="display: block; margin-bottom: 0.25em; font-size: 0.85em; opacity: 0.8; font-weight: 500;">' +
+            'Include parent collections:' +
+            '</label>' +
+            '<select is="emby-select" class="emby-select rule-collections-parent-select" style="width: 100%;">' +
+            '<option value="false">No - Only check the item\'s own collections</option>' +
+            '<option value="true">Yes - Also check collections of parents (season, series, album)</option>' +
+            '</select>' +
+            '</div>' +
             '<div class="rule-collections-depth" style="margin-bottom: 0;">' +
             '<label style="display: flex; align-items: center; margin-bottom: 0.25em; font-size: 0.85em; opacity: 0.8; font-weight: 500;">' +
             'Collection search depth:' +
@@ -1504,6 +1513,8 @@
         // Extract Collections options
         const collectionsSelect = ruleRow.querySelector('.rule-collections-select');
         const collectionsValue = collectionsSelect ? collectionsSelect.value : '';
+        const collectionsParentSelect = ruleRow.querySelector('.rule-collections-parent-select');
+        const collectionsParentValue = collectionsParentSelect ? collectionsParentSelect.value : '';
 
         // Extract Tags, Studios, Genres, IsFavorite, AudioLanguages options
         const tagsSelect = ruleRow.querySelector('.rule-tags-select');
@@ -1568,6 +1579,9 @@
         if (fieldValue === 'Collections') {
             if (collectionsValue === 'true') {
                 expression.IncludeEpisodesWithinSeries = true;
+            }
+            if (collectionsParentValue === 'true') {
+                expression.IncludeParentCollections = true;
             }
             // Extract collection search depth
             var depthInput = ruleRow.querySelector('.rule-collections-depth-input');
@@ -2393,6 +2407,12 @@
                     episodesDiv.style.display = (isCollectionsField && hasEpisode) ? 'block' : 'none';
                 }
 
+                // Parent collections option applies to Collections rules of any media type
+                const parentDiv = ruleRow.querySelector('.rule-collections-parent');
+                if (parentDiv) {
+                    parentDiv.style.display = isCollectionsField ? 'block' : 'none';
+                }
+
                 // Depth option is always visible when the options panel is shown
                 // It's useful for both Playlist and Collection list types
                 const depthDiv = ruleRow.querySelector('.rule-collections-depth');
@@ -2796,6 +2816,12 @@
                             // If false (default), don't include the parameter to save space
                         }
 
+                        // Check for parent collections option (all media types)
+                        const collectionsParentSelect = rule.querySelector('.rule-collections-parent-select');
+                        if (collectionsParentSelect && collectionsParentSelect.value === 'true') {
+                            expression.IncludeParentCollections = true;
+                        }
+
                         // Check for collection search depth
                         const depthInput = rule.querySelector('.rule-collections-depth-input');
                         if (depthInput) {
@@ -3080,6 +3106,10 @@
                     if (collectionsSelect) {
                         const includeValue = expression.IncludeEpisodesWithinSeries === true ? 'true' : 'false';
                         collectionsSelect.value = includeValue;
+                    }
+                    const collectionsParentSelect = ruleRow.querySelector('.rule-collections-parent-select');
+                    if (collectionsParentSelect) {
+                        collectionsParentSelect.value = expression.IncludeParentCollections === true ? 'true' : 'false';
                     }
                 }
 

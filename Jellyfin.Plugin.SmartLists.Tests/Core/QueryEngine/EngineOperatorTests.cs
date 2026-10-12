@@ -969,6 +969,36 @@ public class EngineOperatorTests
     }
 
     /// <summary>
+    /// Collections with IncludeParentCollections follow the Tags convention: positive operators OR
+    /// the item's own collections with its ancestors', negative operators AND them.
+    /// </summary>
+    [Fact]
+    public void CompileRule_CollectionsIncludingParent_OrsPositiveAndAndsNegativeOperators()
+    {
+        var equal = Compile(new Expression("Collections", "Equal", "Kids") { IncludeParentCollections = true });
+        Assert.True(equal(new Operand("item") { ParentCollections = ["Kids"] }));
+        Assert.True(equal(new Operand("item") { Collections = ["Kids"] }));
+        Assert.False(equal(new Operand("item") { Collections = ["Other"], ParentCollections = ["Family"] }));
+
+        var isNotIn = Compile(new Expression("Collections", "IsNotIn", "Family; Kids") { IncludeParentCollections = true });
+        Assert.False(isNotIn(new Operand("item") { ParentCollections = ["Kids"] }));
+        Assert.False(isNotIn(new Operand("item") { Collections = ["Family"] }));
+        Assert.True(isNotIn(new Operand("item") { ParentCollections = ["Other"] }));
+        Assert.True(isNotIn(new Operand("item")));
+    }
+
+    /// <summary>
+    /// Without the option ParentCollections is ignored - only direct membership counts.
+    /// </summary>
+    [Fact]
+    public void CompileRule_CollectionsWithoutParentOption_IgnoresParentCollections()
+    {
+        var rule = Compile(new Expression("Collections", "IsNotIn", "Kids"));
+
+        Assert.True(rule(new Operand("item") { ParentCollections = ["Kids"] }));
+    }
+
+    /// <summary>
     /// OnlyParent skips the item's own tags entirely.
     /// </summary>
     [Fact]

@@ -298,6 +298,10 @@ Filter items based on Jellyfin collection membership.
 **Options:**
 
 - **Include episodes within series** (Playlists with Episodes, default: No) - Include individual episodes from series in collections.
+- **Include parent collections** (all media types, default: No) - Also check the collections the item's parents (season, series, album) belong to. Collections are usually assigned to a series or album, so an episode or track is rarely a direct member of one. With this option, an episode counts as a member of every collection its series is in.
+
+!!! tip "Excluding series by collection"
+    Without **Include parent collections**, a rule like *Collection name is not in "Kids"* matches **every** episode - episodes are not direct members of the collection, only their series is. Enable the option to exclude all episodes of series in "Kids". As with [parent metadata options](#parent-metadata-options), negative operators (**not equals**, **not contains**, **is not in**) then require that *neither* the item nor any parent is in a matching collection.
 
 !!! note "Collections of collections"
     The **Include collections only** checkbox from older versions has been replaced by the **Collection** [media type](media-types.md#container-media-types). Select it to include collection objects themselves, filtered either by their own metadata or by the items inside them.

@@ -559,6 +559,8 @@ namespace Jellyfin.Plugin.SmartLists.Core
                         hashBuilder.Append(':');
                         hashBuilder.Append(expr.IncludeEpisodesWithinSeries?.ToString() ?? "null");
                         hashBuilder.Append(':');
+                        hashBuilder.Append(expr.IncludeParentCollections?.ToString() ?? "null");
+                        hashBuilder.Append(':');
                         hashBuilder.Append(expr.IncludeUnknownDates?.ToString() ?? "null");
                     }
                 }
@@ -4010,6 +4012,7 @@ namespace Jellyfin.Plugin.SmartLists.Core
                 AddParentGroupIfIncluded(requirements, expr.MemberName, "Studios", expr.IncludeParentStudiosEffective, ExtractionGroup.ParentStudios);
                 AddParentGroupIfIncluded(requirements, expr.MemberName, "Genres",  expr.IncludeParentGenresEffective,  ExtractionGroup.ParentGenres);
                 AddParentGroupIfIncluded(requirements, expr.MemberName, "IsFavorite", expr.IncludeParentFavorite,     ExtractionGroup.ParentFavorite);
+                AddParentGroupIfIncluded(requirements, expr.MemberName, "Collections", expr.IncludeParentCollections, ExtractionGroup.ParentCollections);
 
                 // Collect SimilarTo expressions for reference item lookup
                 if (expr.MemberName == "SimilarTo")

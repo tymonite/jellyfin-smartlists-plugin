@@ -51,6 +51,7 @@ namespace Jellyfin.Plugin.SmartLists.Core.QueryEngine
     /// - ParentStudios: AncestorValuesById
     /// - ParentGenres: AncestorValuesById
     /// - ParentFavorite: AncestorItemsById (+ UserDataCache for the per-user lookups)
+    /// - ParentCollections: AncestorItemsById (+ ItemCollectionsWithDepth per ancestor)
     /// - LastEpisodeAirDate: LastEpisodeAirDateById
     /// - LibraryInfo: LibraryNameById
     /// </summary>
@@ -76,7 +77,8 @@ namespace Jellyfin.Plugin.SmartLists.Core.QueryEngine
         LastEpisodeAirDate = 1 << 12, // Fields: LastEpisodeAirDate | Cache: LastEpisodeAirDateById
         ExternalLists = 1 << 20,      // Fields: ExternalList | Cache: ExternalListData, ItemExternalLists
         ParentFavorite = 1 << 21,     // Fields: IsFavorite (with IncludeParentFavorite) | Cache: AncestorItemsById + UserDataCache
-                                      // (1 << 22 .. 1 << 23 free)
+        ParentCollections = 1 << 22,  // Fields: Collections (with IncludeParentCollections) | Cache: AncestorItemsById + ItemCollectionsWithDepth
+                                      // (1 << 23 free)
 
         // Cheap extraction groups (conditional but fast - don't trigger two-phase filtering)
         // Defined in FieldRegistry.CheapExtractionGroups

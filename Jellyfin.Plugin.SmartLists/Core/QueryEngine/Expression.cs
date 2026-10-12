@@ -118,6 +118,10 @@ namespace Jellyfin.Plugin.SmartLists.Core.QueryEngine
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? IncludeUnknownDates { get; set; } = null;
 
+        // Collections-specific option: also match collections of ancestors (season, series, album) - only serialize when meaningful
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? IncludeParentCollections { get; set; } = null;
+
         // Collections-specific depth option - only serialize when meaningful
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? CollectionSearchDepth { get; set; } = null;
